@@ -1,0 +1,35 @@
+# Instagram Platform
+
+
+The Instagram Platform provides APIs and sharing tools that you can use to help app users manage their Instagram presence and interact with end users.
+
+## Instagram API with Unified Login
+
+The [Instagram API with Unified Login](https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-unified-login) lets your business clients connect their Instagram professional account to your app by logging in with either Instagram or Facebook, without a Facebook Page. Through one login flow, your app can send and receive messages, publish content, moderate comments, and manage ads for those accounts.
+
+The Instagram API with Unified Login is the recommended setup for new integrations.
+
+## Instagram API with Instagram Login
+
+The [Instagram API with Instagram Login](https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-instagram-login) allows app users to use your app to manage their Instagram Business or Creator accounts. It supports messaging, media publishing, comment management, mentions, and insights without requiring a Facebook Page.
+
+## Instagram API with Facebook Login
+
+The [Instagram API with Facebook Login](https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-facebook-login) allows app users to use your app to manage Instagram Business or Creator accounts that are linked to a Facebook Page. It supports media management, publishing, comment management, mentions, hashtag search, and insights.
+
+## Instagram Messaging API through Messenger Platform
+
+[Messenger API support for Instagram](https://developers.facebook.com/documentation/business-messaging/instagram-messaging), also known as Instagram Messaging API in the Developer Policies, allows Instagram professional accounts to use your app to manage Instagram and Facebook Page messages from one platform. This setup requires an Instagram Business or Creator account linked to a Facebook Page.
+
+## Webhooks
+
+Use [Instagram Webhooks](https://developers.facebook.com/documentation/instagram-platform/webhooks) to receive real-time notifications about supported activity for Instagram professional accounts connected to your app.
+
+## Sharing
+
+- [Sharing to Stories](https://developers.facebook.com/documentation/instagram-platform/sharing-to-stories) allows people to share content from your app as an Instagram story.
+- [Sharing to Feed](https://developers.facebook.com/documentation/instagram-platform/sharing-to-feed) allows people to share content from your app to their Instagram feed.
+
+## Embedding
+
+Use [Instagram embeds](https://developers.facebook.com/docs/instagram/embedding) to add public Instagram photos and videos to your website.

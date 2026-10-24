@@ -1,0 +1,450 @@
+RFC 4733
+Standar yang Diusulkan
+
+
+Kelompok Kerja Jaringan H. Schulzrinne
+Permintaan Komentar: 4733 Universitas Columbia
+Menggantikan: 2833                                                 T. Taylor
+Kategori: Jalur Standar Nortel
+                                                           Desember 2006
+
+
+  Muatan RTP untuk Digit DTMF, Nada Telepon, dan Sinyal Telepon
+
+Status Memo Ini
+
+   Dokumen ini menetapkan protokol jalur standar Internet untuk
+   Komunitas internet, dan meminta diskusi serta saran untuk
+   perbaikan. Silakan merujuk pada edisi terbaru dari "Internet
+   "Standar Protokol Resmi" (STD 1) untuk negara standardisasi
+   dan status protokol ini. Distribusi memo ini tidak terbatas.
+
+Pemberitahuan Hak Cipta
+
+   Hak cipta (C) The IETF Trust (2006).
+
+Abstrak
+
+   Memo ini menjelaskan cara membawa sinyal dual-tone multifrequency (DTMF).
+   pensinyalan, sinyal nada lainnya, dan peristiwa teleponi dalam paket RTP.
+   Hal ini menggantikan RFC 2833 .
+
+   Memo ini merangkum dan memperluas kerangka dasar yang telah didefinisikan dalam
+   RFC 2833 , tetapi hanya mempertahankan kode peristiwa yang paling dasar. Ini mengatur sebuah
+   Registri IANA tempat penetapan kode peristiwa lainnya dapat ditambahkan.
+   Dokumen pelengkap menambahkan kode peristiwa ke registri ini yang berkaitan dengan
+   modem, faks, telepon teks, dan peristiwa pensinyalan terkait saluran.
+   Kode-kode peristiwa lainnya yang didefinisikan dalam RFC 2833 adalah
+   Dicadangkan secara bersyarat jika dokumen lain menghidupkan kembali penggunaannya.
+
+   Dokumen ini memberikan sejumlah klarifikasi terhadap dokumen aslinya.
+   Namun, dokumen ini secara khusus berbeda dari RFC 2833 dengan menghapus
+   persyaratan bahwa semua implementasi yang sesuai harus mendukung DTMF
+   acara. Sebaliknya, implementasi yang sesuai yang ikut serta dalam
+   Negosiasi di luar jalur konten aliran media menunjukkan peristiwa apa
+   Mereka mendukung hal ini. Memo ini menambahkan tiga prosedur baru ke RFC 2833.
+   Kerangka kerja: pembagian peristiwa panjang menjadi beberapa segmen, pelaporan tentang
+   beberapa peristiwa dalam satu paket, dan konsep serta pelaporannya
+   peristiwa negara.
+
+
+
+
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 1]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+Daftar isi
+
+   1. Pendahuluan .................................................... 4 
+      1.1 . Terminologi ................................................ 4 
+      1.2 . Gambaran Umum ................................................... 4 
+      1.3 . Aplikasi Potensial ..................................... 5 
+      1.4 . Peristiwa, Status, Pola Nada, dan Nada yang Dikodekan Suara ..... 6 
+   2. Format Muatan RTP untuk Peristiwa Telepon Bernama ................... 8 
+      2.1 . Pendahuluan ............................................... 8 
+      2.2 . Penggunaan Bidang Header RTP ................................... 8 
+           2.2.1 . Stempel Waktu ........................................... 8 
+           2.2.2 . Bit Penanda .......................................... 8 
+      2.3 . Format Muatan ............................................. 8 
+           2.3.1 . Bidang Peristiwa ......................................... 9 
+           2.3.2 . Bit E ("Akhir") ....................................... 9 
+           2.3.3 . Bit R ............................................... 9 
+           2.3.4 . Bidang Volume ........................................ 9 
+           2.3.5 . Bidang Durasi ...................................... 9 
+      2.4 . Parameter Tipe Media Opsional ............................ 10 
+           2.4.1 . Hubungan dengan SDP ................................ 10 
+      2.5 . Prosedur ................................................ 11 
+           2.5.1 . Prosedur Pengiriman ................................. 11 
+           2.5.2 . Prosedur Penerimaan ............................... 16 
+      2.6 . Kemacetan dan Kinerja ................................ 19 
+           2.6.1 . Persyaratan Kinerja ........................... 20 
+           2.6.2 . Mekanisme Keandalan ............................. 20 
+           2.6.3 . Penyesuaian terhadap Kemacetan ............................ 22 
+   3 . Spesifikasi Kode Peristiwa untuk Peristiwa DTMF ................... 23 
+      3.1 . Aplikasi DTMF ......................................... 23 
+      3.2 . Peristiwa DTMF ............................................... 25 
+      3.3 . Pertimbangan Kemacetan ................................. 25
+   4. Format Muatan RTP untuk Nada Telepon ......................... 26 
+      4.1 . Pendahuluan .............................................. 26 
+      4.2 . Contoh Sinyal Nada Telepon Umum ................. 27 
+      4.3 . Penggunaan Bidang Header RTP .................................. 27 
+           4.3.1 . Stempel Waktu .......................................... 27 
+           4.3.2 . Bit Penanda ......................................... 27 
+           4.3.3 . Format Muatan ..................................... 28 
+           4.3.4 . Parameter Tipe Media Opsional ..................... 29 
+      4.4 . Prosedur ................................................ 29 
+           4.4.1 . Prosedur Pengiriman ................................. 29 
+           4.4.2 . Prosedur Penerimaan ............................... 30 
+           4.4.3 . Penanganan Kemacetan ............................. 30 
+   5. Contoh ....................................................... 31 
+   6 . Pertimbangan Keamanan ........................................ 38
+
+
+
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 2]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+   7. Pertimbangan IANA ............................................ 38 
+      7.1 . Registrasi Jenis Media .................................. 40 
+           7.1.1 . Registrasi Jenis Media audio/telepon-kejadian ... 40 
+           7.1.2 . Registrasi Jenis Media audio/nada .............. 42 
+   8. Ucapan Terima Kasih ............................................... 43 
+   9. Referensi ..................................................... 43 
+      9.1 . Referensi Normatif ...................................... 43 
+      9.2 . Referensi Informatif .................................... 44 
+   Lampiran A. Ringkasan Perubahan dari RFC 2833 ...................... 46
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 3]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+1. Pendahuluan
+
+1.1 . Terminologi
+
+   Dalam dokumen ini, kata kunci "HARUS", "TIDAK BOLEH", "DIPERLUKAN",
+   "HARUS", "TIDAK AKAN", "SEHARUSNYA", "SEHARUSNYA TIDAK", "DIREKOMENDASIKAN", "MUNGKIN",
+   dan “OPSIONAL” harus diartikan seperti yang dijelaskan dalam RFC 2119 [ 1 ].
+
+   Dokumen ini menggunakan singkatan-singkatan berikut:
+
+   Nada jawaban ANSam (modulasi amplitudo) [ 24 ]
+
+   DTMF Dual-Tone Multifrequency [ 10 ]
+
+   Unit Respons Suara Interaktif (IVR)
+
+   PBX (Private Branch Exchange) (sistem telepon)
+
+   Jaringan Telepon Umum (Switched) PSTN
+
+   RTP Protokol Transportasi Waktu Nyata [ 5 ]
+
+   Protokol Deskripsi Sesi SDP [ 9 ]
+
+1.2 . Gambaran Umum
+
+   Memo ini mendefinisikan dua format payload RTP [ 5 ], satu untuk membawa
+   angka multifrekuensi nada ganda (DTMF) dan saluran serta trunk lainnya
+   sinyal sebagai peristiwa ( Bagian 2 ), dan yang kedua untuk menggambarkan secara umum
+   nada multifrekuensi hanya berdasarkan frekuensi dan iramanya
+   ( Bagian 4 ). Format muatan RTP terpisah untuk sinyal nada telepon
+   Hal ini diinginkan karena codec suara berkecepatan rendah tidak dapat dijamin
+   mereproduksi sinyal nada ini dengan cukup akurat untuk otomatisasi
+   pengenalan. Selain itu, sifat nada seperti fase
+   Perubahan nada pada ANSam tidak akan lolos pengkodean suara. Mendefinisikan
+   Format muatan terpisah juga memungkinkan redundansi yang lebih tinggi, sementara
+   Mempertahankan laju bit yang rendah. Terakhir, beberapa peristiwa telepon seperti
+   "On-hook" terjadi di luar pita frekuensi dan tidak dapat ditransmisikan sebagai nada.
+
+   Bagian selanjutnya dari bagian ini memberikan motivasi untuk mendefinisikan
+   Jenis-jenis muatan yang dijelaskan dalam dokumen ini.   Bagian 2 mendefinisikan
+   Format muatan data dan prosedur terkait untuk penggunaan peristiwa bernama.
+   Bagian 3 menjelaskan peristiwa-peristiwa yang kode peristiwanya telah didefinisikan di dalamnya.
+   dokumen ini.   Bagian 4 menjelaskan format muatan dan yang terkait.
+   prosedur untuk representasi nada.   Bagian 5 memberikan beberapa
+   Contoh peristiwa, nada, dan muatan gabungan yang dikodekan.   Bagian 6 
+   membahas pertimbangan keamanan.   Bagian 7 mendefinisikan IANA .
+   persyaratan untuk pendaftaran kode acara untuk telepon bernama
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 4]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+   peristiwa, menetapkan isi awal dari registri tersebut, dan
+   menyediakan pendaftaran tipe media untuk kedua format muatan data.
+   Lampiran A menjelaskan perubahan dari RFC 2833 [ 12 ] dan khususnya
+   menunjukkan disposisi kode kejadian yang didefinisikan dalam [ 12 ].
+
+1.3 . Aplikasi Potensial
+
+   Format muatan data yang dijelaskan di sini mungkin berguna dalam sejumlah hal.
+   skenario yang berbeda.
+
+   Di sisi pengirim, ada dua kemungkinan dasar: yaitu
+   Sisi pengirim adalah sistem ujung yang menghasilkan sinyal itu sendiri, atau
+   Ini adalah sebuah gerbang yang bertugas untuk menyebarkan sinyal telepon yang masuk.
+   sinyal ke Internet.
+
+   Di sisi penerima, ada lebih banyak kemungkinan. Yang pertama adalah
+   bahwa penerima harus menyebarkan sinyal nada secara akurat ke dalam
+   PSTN untuk konsumsi mesin. Salah satu contohnya adalah gateway.
+   Meneruskan nada DTMF ke IVR. Dalam skenario ini, frekuensi,
+   amplitudo, durasi nada, dan durasi jeda antar nada
+   semuanya penting, dan sinyal nada individual harus disampaikan.
+   dapat diandalkan dan teratur.
+
+   Dalam skenario penerimaan kedua, penerima harus memutar nada untuk
+   konsumsi manusia. Biasanya, alih-alih serangkaian sinyal nada
+   masing-masing dengan maknanya sendiri, kontennya akan terdiri dari satu nada tunggal.
+   dimainkan terus menerus atau rangkaian nada tunggal dan mungkin
+   Keheningan, berulang secara siklik selama beberapa waktu. Seringkali akhirnya
+   Pemutaran nada akan dipicu oleh suatu peristiwa yang diumpan balik ke dalam
+   arah lain, menggunakan cara in-band atau out-of-band. Contohnya adalah
+   Ini adalah nada sambung atau nada sibuk.
+
+   Hubungan antara posisi dalam jaringan dan nada yang akan digunakan
+   Situasi yang terjadi merupakan faktor yang memperumit skenario ini. Di telepon
+   Pada jaringan, nada dihasilkan di tempat yang berbeda, tergantung pada
+   Teknologi pengalihan dan sifat nada. Ini menentukan,
+   misalnya, apakah seseorang sedang melakukan panggilan ke negara asing
+   mendengar nada-nada lokal yang dikenalnya atau nada-nada seperti yang digunakan di
+   Negara itu menelepon.
+
+   Untuk saluran analog, nada sambung selalu dihasilkan oleh sakelar lokal.
+   Terminal Integrated Services Digital Network (ISDN) dapat menghasilkan
+   nada sambung lokal lalu kirim Q.931 [ 22 ] SETUP yang berisi
+   angka yang didial. Jika terminal hanya mengirimkan pesan SETUP
+   tanpa angka Pihak yang Dipanggil, maka sakelar akan melakukan digit
+   koleksi (disediakan oleh terminal sebagai digit penekanan tombol KEYPAD)
+   informasi dalam Informasi Pihak yang Dipanggil atau Fasilitas Tombol Angka
+   Elemen (IE) dari pesan INFORMASI), dan menyediakan nada sambung melalui
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 5]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+   Saluran B. Terminal dapat menggunakan sinyal audio pada
+   Saluran B atau gunakan pesan Q.931 untuk memicu panggilan yang dihasilkan secara lokal.
+   nada.
+
+   Nada dering (juga disebut nada tunggu) dihasilkan oleh operator lokal.
+   beralih di pihak penerima panggilan, dengan jalur suara satu arah dibuka segera setelah
+   Telepon penerima panggilan berdering. (Ini mengurangi kemungkinan terpotongnya panggilan)
+   disebut tanggapan pihak tersebut tepat setelah jawaban. Ini juga memungkinkan pra-
+   menjawab pengumuman atau indikasi kemajuan panggilan dalam pita frekuensi untuk mencapai
+   (Penelepon sebelum atau sebagai pengganti nada dering.) Nada kemacetan dan
+   Nada informasi khusus dapat dihasilkan oleh sakelar mana pun.
+   di sepanjang jalan, dan mungkin dihasilkan oleh sakelar pemanggil berdasarkan
+   Pesan ISDN User Part (ISUP) diterima. Nada sibuk dihasilkan oleh
+   sakelar pemanggil, yang dipicu oleh pesan ISUP yang sesuai, untuk
+   instrumen analog, atau terminal ISDN.
+
+   Pada skenario ketiga, sistem akhir terhubung langsung ke
+   Internet dan memproses aliran media yang masuk secara langsung. Ada
+   tidak perlu meregenerasi sinyal nada, sehingga penyelarasan waktu dan daya
+   Level tidak relevan. Sistem ini bergantung pada sistem pengiriman ke
+   menghasilkan peristiwa sebagai pengganti nada dan tidak melakukan audio sendiri.
+   Analisis bentuk gelombang. Contoh sistem seperti itu adalah Internet.
+   Sistem respons suara interaktif (IVR).
+
+   Dalam situasi di mana penyelarasan waktu yang tepat antara audio
+   aliran dan digit DTMF atau peristiwa lainnya tidak penting dan data
+   Jika dikirim secara unicast, seperti pada contoh IVR, mungkin lebih baik menggunakan
+   protokol kontrol yang andal, bukan paket RTP. Dalam hal tersebut
+   Dalam keadaan tertentu, format payload ini tidak akan digunakan.
+
+   Perlu dicatat bahwa dalam sejumlah kasus ini, ada kemungkinan bahwa gateway tersebut
+   atau sistem ujung akan menjadi pengirim dan penerima telepon.
+   sinyal. Terkadang jenis sinyal yang sama akan dikirimkan sebagai
+   diterima -- dalam kasus "RTP trunking" atau data pita suara, untuk
+   misalnya. Dalam kasus lain, seperti sistem akhir yang melayani
+   saluran analog, sinyal yang dikirim akan berada dalam kelas yang berbeda dari
+   yang diterima.
+
+1.4 . Peristiwa, Keadaan, Pola Nada, dan Nada yang Dikodekan Suara
+
+   Dokumen ini menyediakan sarana untuk transmisi in-band melalui
+   Internet terdiri dari dua kelas besar informasi pensinyalan: in-band
+   nada atau rangkaian nada, dan sinyal yang dikirim di luar pita frekuensi di PSTN.
+   Sinyal nada dapat ditransmisikan menggunakan salah satu dari tiga metode yang tercantum.
+   di bawah ini. Tergantung pada aplikasinya, mungkin perlu untuk membawa
+   Informasi sinyal dalam lebih dari satu bentuk sekaligus.
+
+
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 6]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+   1. Gateway atau sistem akhir dapat beralih ke codec dengan bandwidth lebih tinggi.
+       seperti G.711 [ 19 ] ketika sinyal nada akan disampaikan. Lihat yang baru
+       Rekomendasi ITU-T V.152 [ 26 ] untuk penanganan formal hal ini
+       pendekatan. Atau, untuk sinyal faks, teks, atau modem
+       masing-masing, transportasi khusus seperti T.38 [ 23 ], RFC 4103 
+       [ 15 ], atau relai modem V.150.1 [ 25 ] dapat digunakan. Terakhir, 64
+       Saluran kbit/s dapat dibawa secara transparan menggunakan 
+       tipe payload RFC 4040 Clearmode [ 14 ]. Metode ini berada di luar cakupan
+       Dokumen ini, tetapi dapat digunakan bersama dengan muatan data.
+       Jenis-jenis yang didefinisikan di sini.
+
+   2. Gateway pengirim dapat dengan mudah mengukur komponen frekuensi.
+       dari sinyal pita suara dan mengirimkan informasi ini ke
+       Penerima RTP menggunakan representasi nada yang didefinisikan dalam hal ini.
+       dokumen ( Bagian 4 ). Dalam mode ini, gateway tidak melakukan upaya apa pun.
+       untuk memahami makna nada, tetapi hanya membedakan
+       nada dari sinyal ucapan. Sistem akhir dapat menggunakan hal yang sama.
+       pendekatan menggunakan frekuensi yang dikonfigurasi, bukan frekuensi yang diukur.
+
+       Semua sinyal nada yang digunakan di PSTN dan ditujukan untuk manusia
+       Konsumsi adalah rangkaian kombinasi sederhana dari gelombang sinus,
+       baik ditambahkan atau dimodulasi. (Namun, beberapa sinyal modem seperti
+       nada ANSam [ 24 ] atau sistem yang bergantung pada penggeseran fase
+       (Tidak bisa dijelaskan sesederhana itu.)
+
+   3. Sebagai opsi ketiga, gateway pengirim dapat mengenali nada seperti
+       nada dering atau nada sibuk atau angka DTMF '0', dan mengirimkan kode yang
+       mengidentifikasi mereka menggunakan muatan peristiwa telepon yang didefinisikan dalam ini
+       dokumen ( Bagian 2 ). Penerima kemudian menghasilkan sinyal nada
+       atau indikasi lain yang sesuai dengan sinyal tersebut. Secara umum, karena
+       Pengenalan sinyal di pihak pengirim seringkali bergantung pada
+       pola hidup/mati atau urutan beberapa nada, pengenalan ini
+       bisa memakan waktu beberapa detik. Di sisi lain, gateway mungkin
+       memiliki akses ke informasi sinyal aktual yang dihasilkan
+       nada-nada tersebut sehingga dapat menghasilkan paket RTP secara langsung,
+       tanpa melalui jalan memutar lewat sinyal akustik.
+
+   Opsi ketiga (penggunaan peristiwa bernama) adalah satu-satunya metode yang layak.
+   untuk mengirimkan sinyal PSTN di luar pita frekuensi sebagai konten dalam RTP.
+   sesi.
+
+
+
+
+
+
+
+
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 7]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+2. Format Payload RTP untuk Peristiwa Telepon Bernama
+
+2.1 . Pendahuluan
+
+   Format muatan RTP untuk peristiwa telepon bernama ditetapkan sebagai
+   "acara telepon", jenis media sebagai "acara audio/telepon". Di
+   Sesuai dengan praktik saat ini, format muatan ini tidak memiliki
+   nomor tipe payload statis, tetapi menggunakan nomor tipe payload RTP.
+   Ditetapkan secara dinamis dan di luar pita frekuensi. Frekuensi clock default
+   adalah 8000 Hz, tetapi frekuensi clock dapat didefinisikan ulang saat menetapkan
+   tipe payload dinamis.
+
+   Peristiwa telepon yang disebutkan namanya dibawa sebagai bagian dari aliran audio dan
+   HARUS menggunakan nomor urut dan basis stempel waktu yang sama dengan yang biasa.
+   saluran audio untuk menyederhanakan pembuatan bentuk gelombang audio pada
+   gerbang. Tipe muatan kejadian telepon yang disebutkan dapat dianggap sebagai
+   merupakan codec audio yang sangat terkompresi dan diperlakukan sama seperti
+   codec lainnya.
+
+2.2 . Penggunaan Kolom Header RTP
+
+2.2.1 . Cap waktu
+
+   Durasi peristiwa yang dijelaskan di Bagian 2.5 dimulai pada waktu yang diberikan.
+   berdasarkan stempel waktu RTP. Untuk peristiwa yang mencakup beberapa paket RTP, maka
+   Stempel waktu RTP mengidentifikasi awal peristiwa, yaitu, beberapa
+   Paket RTP dapat membawa stempel waktu yang sama. Untuk peristiwa yang berlangsung lama.
+   yang harus dibagi menjadi beberapa segmen (lihat di bawah, Bagian 2.5.1.3 ),
+   Timestamp menunjukkan awal segmen.
+
+2.2.2 . Mata Bor Penanda
+
+   Bit penanda RTP menunjukkan awal dari suatu peristiwa baru. Untuk jangka panjang-
+   Peristiwa yang berlangsung lama dan harus dibagi menjadi beberapa segmen (lihat di bawah,
+   Bagian 2.5.1.3 ), hanya segmen pertama yang akan memiliki bit penanda.
+   mengatur.
+
+2.3 . Format Muatan
+
+   Format muatan data untuk peristiwa telepon bernama ditunjukkan pada Gambar 1.
+
+    0 1 2 3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | acara | UGD | volume | durasi |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                 Gambar 1: Format Muatan untuk Peristiwa Bernama
+
+
+
+Lagu Standar Schulzrinne & Taylor [Halaman 8]
+RFC 4733                Peristiwa dan Nada Telepon Desember 2006
+
+
+2.3.1 . Bidang Kejadian
+
+   Kolom kejadian adalah angka antara 0 dan 255 yang mengidentifikasi kejadian spesifik.
+   Peristiwa teleponi. Registri kode peristiwa IANA untuk bidang ini memiliki
+   telah ditetapkan (lihat Pertimbangan IANA, Bagian 7 ). Awalnya
+   Isi dari registri ini terdiri dari peristiwa-peristiwa yang didefinisikan d
